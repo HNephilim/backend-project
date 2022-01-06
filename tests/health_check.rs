@@ -1,3 +1,4 @@
+use secrecy::ExposeSecret;
 use sqlx::{Connection, Executor, PgConnection, PgPool};
 
 #[tokio::test]
@@ -83,30 +84,42 @@ async fn subscribe_return_400_when_data_is_missing() {
 
 
 
+//Ensure that 'tracing' stack is only initialised once using 'once_cell'
+static TRACING: once_cell::sync::Lazy<()> = once_cell::sync::Lazy::new(||{
+    use backend_project::telemetry;
+    let default_name = "Test".to_string();
+    let default_filter_level = "debug".to_string();
 
+    if std::env::var("TEST_LOG").is_ok(){
+        let subscriber = telemetry::get_subscriber(default_name,default_filter_level, std::io::stdout);
+        telemetry::init_subscriber(subscriber);
+    }else{
+        let subscriber = telemetry::get_subscriber(default_name,default_filter_level, std::io::sink);
+        telemetry::init_subscriber(subscriber);
+    }
+
+});
 
 pub struct TestApp{
     pub address: String,
     pub db_pool: sqlx::PgPool,
-
 }
 
-
 async fn spawn_app() -> TestApp {
+    //Runs the closure in TRACING only the first time it's invoked
+    //All other invocations will skip
+    once_cell::sync::Lazy::force(&TRACING);
+
     //Get the port assigned to us by the OS
     let listener =
         std::net::TcpListener::bind("127.0.0.1:0").expect("Failed to bind to a random port");
     let port = listener.local_addr().unwrap().port();
     let address = format!("http://127.0.0.1:{}", port);
 
-
-
     //Inicialize DB Connection Pool
     let mut configurarion = backend_project::configuration::get_configuration().expect("Failed to read configurations");
     configurarion.database.db_name = uuid::Uuid::new_v4().to_string();
-    eprintln!("Connection => {}", &configurarion.database.connection_without_db_string());
     let db_pool = configure_database(&configurarion.database).await;
-
 
     // Inicialize server in background worker
     let server = backend_project::startup::run_server(listener, db_pool.clone()).expect("Failed to bind address");
@@ -122,7 +135,7 @@ async fn spawn_app() -> TestApp {
 }
 
 pub async fn configure_database(config: &backend_project::configuration::DatabaseSettings) -> sqlx::PgPool{
-    let mut connection = PgConnection::connect(&config.connection_without_db_string())
+    let mut connection = PgConnection::connect(&config.connection_without_db_string().expose_secret())
         .await
         .expect("Failed to connect to PostgresDB");
 
@@ -132,7 +145,7 @@ pub async fn configure_database(config: &backend_project::configuration::Databas
         .expect("Failed to create database.");
 
     //Migrate DB
-    let conn_pool = PgPool::connect(&config.connection_string())
+    let conn_pool = PgPool::connect(&config.connection_string().expose_secret())
         .await
         .expect("Failed to connect to Postgres");
 
