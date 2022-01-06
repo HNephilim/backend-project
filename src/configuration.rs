@@ -33,7 +33,7 @@ pub fn get_configuration() -> Result<Settings, config::ConfigError>{
     let mut settings = config::Config::default();
 
     //read and parse the configuration file "config"
-    settings.merge(config::File::with_name("config"));
+    settings.merge(config::File::with_name("config")).unwrap();
 
     //convert settings in our setting
     settings.try_into()
