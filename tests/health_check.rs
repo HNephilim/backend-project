@@ -1,4 +1,3 @@
-use secrecy::ExposeSecret;
 use sqlx::{Connection, Executor, PgConnection, PgPool};
 
 #[tokio::test]
@@ -135,7 +134,7 @@ async fn spawn_app() -> TestApp {
 }
 
 pub async fn configure_database(config: &backend_project::configuration::DatabaseSettings) -> sqlx::PgPool{
-    let mut connection = PgConnection::connect(&config.connection_without_db_string().expose_secret())
+    let mut connection = PgConnection::connect_with(&config.without_db())
         .await
         .expect("Failed to connect to PostgresDB");
 
@@ -145,7 +144,7 @@ pub async fn configure_database(config: &backend_project::configuration::Databas
         .expect("Failed to create database.");
 
     //Migrate DB
-    let conn_pool = PgPool::connect(&config.connection_string().expose_secret())
+    let conn_pool = PgPool::connect_with(config.with_db())
         .await
         .expect("Failed to connect to Postgres");
 

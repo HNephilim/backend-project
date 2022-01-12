@@ -1,0 +1,30 @@
+{
+  "db": "PostgreSQL",
+  "5c58c053bd94775fb6dbe216945cb0b6367dbf905b7c988b1697415b4773904c": {
+    "query": "\n        INSERT INTO subscription (id, email, name, subscribed_at)\n        VALUES ($1, $2, $3, $4)\n        ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Left": [
+          "Uuid",
+          "Text",
+          "Text",
+          "Timestamptz"
+        ]
+      },
+      "nullable": []
+    }
+  },
+  "80df1a5c560a065ba06a5ff4ca5f46876f2c7807c356c5f8ff1f2c4355b3b20b": {
+    "query": "\n        DELETE FROM subscription\n        WHERE email=$1\n        ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Left": [
+          "Text"
+        ]
+      },
+      "nullable": []
+    }
+  }
+}
