@@ -12,5 +12,5 @@ steps:
            '-f', 'Dockerfile',
            '.']
     #push image to register
-    images:
-      - 'gcr.io/$PROJECT_ID/rotwebserver:latest'
+images:
+    - 'gcr.io/$PROJECT_ID/rotwebserver:latest'
