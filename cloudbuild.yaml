@@ -8,7 +8,7 @@ steps:
   - name: 'gcr.io/cloud-builders/docker'
     args: ['build',
            '-t', 'gcr.io/$PROJECT_ID/rotwebserver:latest',
-           '--cache-from', 'gcr.io/$PROJECT_ID/rotwebserver:latest'
+           '--cache-from', 'gcr.io/$PROJECT_ID/rotwebserver:latest',
            '-f', 'Dockerfile',
            '.']
     #push image to register
