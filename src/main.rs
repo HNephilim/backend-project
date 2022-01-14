@@ -1,4 +1,3 @@
-use secrecy::ExposeSecret;
 use backend_project::{startup, configuration, telemetry};
 
 
