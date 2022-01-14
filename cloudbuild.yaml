@@ -14,3 +14,5 @@ steps:
     #push image to register
 images:
     - 'gcr.io/$PROJECT_ID/rotwebserver:latest'
+
+timeout: 1800s
