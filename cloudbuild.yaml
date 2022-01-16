@@ -1,17 +1,31 @@
 steps:
-    #Pulling cache from the last build. If not available, just exit normally
+    #Step 1 -> Pull the builder from the registry container
   - name: 'gcr.io/cloud-builders/docker'
     entrypoint: 'bash'
-    args: ['-c', 'docker pull gcr.io/$PROJECT_ID/rotwebserver:latest || exit 0']
+    args: ['-c', 'docker pull gcr.io/$PROJECT_ID/rotwebserver:builder || exit 0']
 
-    #Build with cache found
+    #Step 2 -> Rebuild the builder, using the cached from last build
+  - name: 'gcr.io/cloud-builders/docker'
+    args: [ 'build',
+            '-t', 'gcr.io/$PROJECT_ID/rotwebserver:builder',
+            '--target', 'builder',
+            '--cache-from', 'gcr.io/$PROJECT_ID/rotwebserver:builder',
+            '-f', 'Dockerfile',
+            '.']
+
+    #Step 3 -> Store the new builder image in the Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push gcr.io/$PROJECT_ID/rotwebserver:builder']
+
+    #Step 4 -> Build the runtime image
   - name: 'gcr.io/cloud-builders/docker'
     args: ['build',
            '-t', 'gcr.io/$PROJECT_ID/rotwebserver:latest',
-           '--cache-from', 'gcr.io/$PROJECT_ID/rotwebserver:latest',
+           '--cache-from', 'gcr.io/$PROJECT_ID/rotwebserver:builder',
            '-f', 'Dockerfile',
            '.']
-    #push image to register
+
+    #Make the image made last step available after the build
 images:
     - 'gcr.io/$PROJECT_ID/rotwebserver:latest'
 
