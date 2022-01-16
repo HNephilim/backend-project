@@ -31,7 +31,7 @@ tracing-actix-web = {path = "vendor/tracing-actix-web"}
 version = "0.5.7"
 default-features = false
 features = [
-    "runtime-actix-rustls",
+    "runtime-actix-native-tls",
     "macros",
     "postgres",
     "uuid",
