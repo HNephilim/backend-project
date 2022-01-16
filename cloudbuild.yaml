@@ -15,7 +15,7 @@ steps:
 
     #Step 3 -> Store the new builder image in the Registry
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['push gcr.io/$PROJECT_ID/rotwebserver:builder']
+    args: ['push', 'gcr.io/$PROJECT_ID/rotwebserver:builder']
 
     #Step 4 -> Build the runtime image
   - name: 'gcr.io/cloud-builders/docker'
