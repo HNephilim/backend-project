@@ -25,6 +25,14 @@ steps:
            '-f', 'Dockerfile',
            '.']
 
+    #Step 5 -> Deploy Image
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args: [ 'run',
+            'deploy', 'rotwebserver',
+            '--image', 'gcr.io/$PROJECT_ID/rotwebserver:latest',
+            '--region', 'us-central1' ]
+
     #Make the image made last step available after the build
 images:
     - 'gcr.io/$PROJECT_ID/rotwebserver:latest'
