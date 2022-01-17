@@ -1,4 +1,5 @@
 use backend_project::{startup, configuration, telemetry};
+use backend_project::configuration::Settings;
 
 
 #[tokio::main]
@@ -13,9 +14,13 @@ async fn main() -> std::io::Result<()> {
 
     let address = format!("{}:{}", configuration.application.host, configuration.application.port);
     let listener = std::net::TcpListener::bind(address)?;
-    println!("Port = {}", &listener.local_addr().unwrap().port());
+    print(&configuration);
+
     startup::run_server(listener, conn_pool)?.await
 }
 
+fn print(config: &Settings){
+    println!("{:#?}", config);
+}
 
 
