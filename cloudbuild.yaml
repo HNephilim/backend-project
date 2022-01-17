@@ -25,7 +25,12 @@ steps:
            '-f', 'Dockerfile',
            '.']
 
-    #Step 5 -> Deploy Image
+    #Step 5 -> Store the new latest image in the Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args: [ 'push', 'gcr.io/$PROJECT_ID/rotwebserver:latest' ]
+
+
+    #Step 6 -> Deploy Image
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: gcloud
     args: [ 'run',
