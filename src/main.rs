@@ -1,6 +1,4 @@
-use secrecy::ExposeSecret;
 use backend_project::{startup, configuration, telemetry};
-use backend_project::configuration::Settings;
 
 
 #[tokio::main]

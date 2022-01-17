@@ -117,7 +117,7 @@ async fn spawn_app() -> TestApp {
 
     //Inicialize DB Connection Pool
     let mut configurarion = backend_project::configuration::get_configuration().expect("Failed to read configurations");
-    configurarion.database.db_name = uuid::Uuid::new_v4().to_string();
+    configurarion.database.database = uuid::Uuid::new_v4().to_string();
     let db_pool = configure_database(&configurarion.database).await;
 
     // Inicialize server in background worker
@@ -139,7 +139,7 @@ pub async fn configure_database(config: &backend_project::configuration::Databas
         .expect("Failed to connect to PostgresDB");
 
     //Create DB
-    connection.execute(format!(r#"CREATE DATABASE "{}";"#, config.db_name).as_str())
+    connection.execute(format!(r#"CREATE DATABASE "{}";"#, config.database).as_str())
         .await
         .expect("Failed to create database.");
 
