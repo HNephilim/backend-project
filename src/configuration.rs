@@ -52,6 +52,7 @@ impl DatabaseSettings{
             .password(&self.password.expose_secret())
             .port(self.port)
             .ssl_mode(ssl_mode)
+            .socket("/cloudsql/rotwebserver:southamerica-east1:erick-newsletter")
 
     }
 }
