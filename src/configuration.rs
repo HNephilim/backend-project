@@ -4,20 +4,20 @@ use sqlx::ConnectOptions;
 use sqlx::postgres::{PgConnectOptions, PgSslMode};
 
 
-#[derive(serde::Deserialize, Debug)]
+#[derive(serde::Deserialize)]
 pub struct Settings{
     pub database: DatabaseSettings,
     pub application: ApplicationSettings,
 }
 
-#[derive(serde::Deserialize, Debug)]
+#[derive(serde::Deserialize)]
 pub struct ApplicationSettings{
     #[serde(deserialize_with = "deserialize_number_from_string")]
     pub port: u16,
     pub host: String,
 }
 
-#[derive(serde::Deserialize, Debug)]
+#[derive(serde::Deserialize)]
 pub struct DatabaseSettings{
     pub username: String,
     pub password: Secret<String>,
@@ -26,6 +26,7 @@ pub struct DatabaseSettings{
     pub host: String,
     pub database: String,
     pub require_ssl: bool,
+    pub socket: Option<String>
 }
 
 impl DatabaseSettings{
@@ -45,15 +46,19 @@ impl DatabaseSettings{
             PgSslMode::Prefer
         };
 
-
-        PgConnectOptions::new()
+        let options = PgConnectOptions::new()
             .host(&self.host)
             .username(&self.username)
             .password(&self.password.expose_secret())
             .port(self.port)
-            .ssl_mode(ssl_mode)
-            .socket("/cloudsql/rotwebserver:southamerica-east1:erick-newsletter")
+            .ssl_mode(ssl_mode);
 
+
+        if self.socket.is_some(){
+            options.socket(self.socket.as_ref().unwrap())
+        } else{
+            options
+        }
     }
 }
 
